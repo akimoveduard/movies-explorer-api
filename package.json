@@ -1,0 +1,34 @@
+{
+  "name": "movies-explorer-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "test",
+    "start": "nodemon index.js",
+    "lint": "npx eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/akimoveduard/movies-explorer-api.git"
+  },
+  "keywords": [
+    "praktikum",
+    "movies"
+  ],
+  "author": "Eduard Akimov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/akimoveduard/movies-explorer-api/issues"
+  },
+  "homepage": "https://github.com/akimoveduard/movies-explorer-api#readme",
+  "devDependencies": {
+    "eslint": "^8.22.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-import": "^2.26.0",
+    "nodemon": "^2.0.19"
+  },
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}
