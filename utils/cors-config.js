@@ -1,6 +1,9 @@
 const corsConfig = {
   origin: [
-    'localhost',
+    'http://akimoved.nomoredomains.sbs',
+    'https://akimoved.nomoredomains.sbs',
+    'http://localhost',
+    'https://localhots',
   ],
   credentials: true,
 };

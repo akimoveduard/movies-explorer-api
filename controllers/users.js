@@ -5,10 +5,9 @@ const getJwtToken = require('../utils/jwt');
 
 const ErrorBadRequest = require('../utils/errors/bad-request'); // 400
 const ErrorUnauthorized = require('../utils/errors/unauthorized'); // 401
-const ErrorNotFound = require('../utils/errors/not-found'); // 404
 const ErrorConflict = require('../utils/errors/conflict'); // 409
 
-const { SALT_ROUNDS = 10 } = process.env;
+const SALT_ROUNDS = require('../utils/config');
 
 const createUser = (req, res, next) => {
   const {
@@ -55,9 +54,9 @@ const authUser = (req, res, next) => {
       res
         .cookie('jwt', token, {
           maxage: 3600000 * 24 * 7,
-          /*httpOnly: true,
+          httpOnly: true,
           sameSite: 'none',
-          secure: true,*/
+          secure: true,
         })
         .send({ message: 'Успешная авторизация.' });
     })
@@ -71,13 +70,36 @@ const logout = (req, res) => {
 };
 
 const getUser = (req, res, next) => {
-  User.findById(req.params.id)
-    .then((user) => {
-      if (!user) {
-        next(new ErrorNotFound('Пользователь не найден.'));
-      } else res.send(user);
-    })
+  User.findById(req.user.payload)
+    .then((user) => res.send({
+      email: user.email,
+      name: user.name,
+    }))
     .catch(next);
+};
+
+const updateUser = (req, res, next) => {
+  const { email, name } = req.body;
+  User.findByIdAndUpdate(
+    req.user.payload,
+    { email, name },
+    {
+      new: true,
+      runValidators: true,
+      upsert: false,
+    },
+  )
+    .then((user) => res.send({
+      email: user.email,
+      name: user.name,
+    }))
+    .catch((error) => {
+      if (error.name === 'ValidationError') {
+        next(new ErrorBadRequest('Переданы некорректные данные.'));
+      } else {
+        next(error);
+      }
+    });
 };
 
 module.exports = {
@@ -85,4 +107,5 @@ module.exports = {
   authUser,
   logout,
   getUser,
+  updateUser,
 };
