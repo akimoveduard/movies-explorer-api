@@ -20,8 +20,8 @@ const validateUserCreate = celebrate({
     name: Joi.string().min(2).max(30).required()
       .messages({
         'any.required': userErrorsMessages.name.required,
-        'string.min': userErrorsMessages.name.min,
-        'string.max': userErrorsMessages.name.max,
+        'string.min': userErrorsMessages.name.length,
+        'string.max': userErrorsMessages.name.length,
       }),
   }),
 });
@@ -46,8 +46,10 @@ const validateUpdateUser = celebrate({
       }),
     name: Joi.string().min(2).max(30).required()
       .messages({
-        'string.min': userErrorsMessages.name.min,
-        'string.max': userErrorsMessages.name.max,
+        'any.required': userErrorsMessages.name.required,
+        'string.empty': userErrorsMessages.name.length,
+        'string.min': userErrorsMessages.name.length,
+        'string.max': userErrorsMessages.name.length,
       }),
   }),
 });
