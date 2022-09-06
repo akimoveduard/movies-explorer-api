@@ -1,4 +1,5 @@
 const { celebrate, Joi } = require('celebrate');
+const validator = require('validator');
 
 const {
   userErrorsMessages,
@@ -55,59 +56,63 @@ const validateUpdateUser = celebrate({
 
 const validateMoviePost = celebrate({
   body: Joi.object().keys({
-    country: Joi.string().alphanum().required()
-      .messages({
-        'any.required': movieErrorsMessages.country.required,
-      }),
-    director: Joi.string().alphanum().required()
-      .messages({
-        'any.required': movieErrorsMessages.director.required,
-      }),
-    duration: Joi.number().integer().required()
-      .messages({
-        'any.required': movieErrorsMessages.duration.required,
-        'number.base': 'Должно быть числом',
-      }),
-    year: Joi.string().required().length(4).pattern(/^[0-9]+$/)
+    country: Joi.string().required().messages({
+      'any.required': movieErrorsMessages.country.required,
+    }),
+    director: Joi.string().required().messages({
+      'any.required': movieErrorsMessages.director.required,
+    }),
+    duration: Joi.number().integer().required().messages({
+      'any.required': movieErrorsMessages.duration.required,
+      'number.base': movieErrorsMessages.duration.base,
+    }),
+    year: Joi.string()
+      .required()
+      .length(4)
+      .pattern(/^[0-9]+$/)
       .messages({
         'any.required': movieErrorsMessages.year.required,
         'string.length': movieErrorsMessages.year.length,
         'string.pattern.base': movieErrorsMessages.year.pattern,
       }),
-    description: Joi.string().required()
-      .messages({
-        'any.required': movieErrorsMessages.description.required,
-      }),
-    image: Joi.string().required().pattern(/^https?:\/\/([a-z0-9]{1})((\.[a-z0-9-])|([a-z0-9-]))*\.([a-z0-9]+)(\/[\w-.~:?#[\]@!$&'()*+,;=]+)*#?\/?$/)
+    description: Joi.string().required().messages({
+      'any.required': movieErrorsMessages.description.required,
+    }),
+    image: Joi.string().required()
+      .custom((value, helpers) => (validator.isURL(value)
+        ? value
+        : helpers.message(movieErrorsMessages.image.pattern)))
       .messages({
         'any.required': movieErrorsMessages.image.required,
         'string.empty': movieErrorsMessages.image.empty,
-        'string.pattern.base': movieErrorsMessages.image.pattern,
       }),
-    trailerLink: Joi.string().required().pattern(/^https?:\/\/([a-z0-9]{1})((\.[a-z0-9-])|([a-z0-9-]))*\.([a-z0-9]+)(\/[\w-.~:?#[\]@!$&'()*+,;=]+)*#?\/?$/)
+    trailerLink: Joi.string().required()
+      .custom((value, helpers) => (validator.isURL(value)
+        ? value
+        : helpers.message(movieErrorsMessages.trailerLink.pattern)))
       .messages({
         'any.required': movieErrorsMessages.trailer.required,
         'string.empty': movieErrorsMessages.trailer.empty,
         'string.pattern.base': movieErrorsMessages.trailer.pattern,
       }),
-    thumbnail: Joi.string().required().pattern(/^https?:\/\/([a-z0-9]{1})((\.[a-z0-9-])|([a-z0-9-]))*\.([a-z0-9]+)(\/[\w-.~:?#[\]@!$&'()*+,;=]+)*#?\/?$/)
+    thumbnail: Joi.string().required()
+      .custom((value, helpers) => (validator.isURL(value)
+        ? value
+        : helpers.message(movieErrorsMessages.thumbnail.pattern)))
       .messages({
         'any.required': movieErrorsMessages.thumbnail.required,
         'string.empty': movieErrorsMessages.thumbnail.empty,
         'string.pattern.base': movieErrorsMessages.thumbnail.pattern,
       }),
-    movieId: Joi.string().required()
-      .messages({
-        'any.required': movieErrorsMessages.movieId.required,
-      }),
-    nameRU: Joi.string().required()
-      .messages({
-        'any.required': movieErrorsMessages.nameRU.required,
-      }),
-    nameEN: Joi.string().required()
-      .messages({
-        'any.required': movieErrorsMessages.nameEN.required,
-      }),
+    movieId: Joi.string().required().messages({
+      'any.required': movieErrorsMessages.movieId.required,
+    }),
+    nameRU: Joi.string().required().messages({
+      'any.required': movieErrorsMessages.nameRU.required,
+    }),
+    nameEN: Joi.string().required().messages({
+      'any.required': movieErrorsMessages.nameEN.required,
+    }),
   }),
 });
 
@@ -116,7 +121,7 @@ const validateMovieId = celebrate({
     movieId: Joi.string().hex().length(24),
   })
     .messages({
-      'string.length': 'id фильма должен состоять из 24 символов.',
+      'string.length': movieErrorsMessages.movieId.length,
     }),
 });
 

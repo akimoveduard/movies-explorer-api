@@ -8,10 +8,16 @@ const {
   SALT_ROUNDS = 10,
 } = process.env;
 
+const loggerFilenames = {
+  requestLogFilename: 'request.log',
+  errorLogFilename: 'error.log',
+};
+
 module.exports = {
   PORT,
   MONGODB_CONNECT,
   JWT_SECRET,
   NODE_ENV,
   SALT_ROUNDS,
+  loggerFilenames,
 };

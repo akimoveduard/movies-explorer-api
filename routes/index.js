@@ -3,6 +3,7 @@ const router = require('express').Router();
 const auth = require('../middlewares/auth');
 
 const ErrorNotFound = require('../utils/errors/not-found');
+const messages = require('../utils/messages');
 
 const {
   validateUserCreate,
@@ -28,7 +29,7 @@ router.use('/users', routesUsers);
 router.use('/movies', routesMovies);
 
 router.use((req, res, next) => {
-  next(new ErrorNotFound('Страница не найдена.'));
+  next(new ErrorNotFound(messages.errorsMessages.pageNotFound));
 });
 
 module.exports = router;

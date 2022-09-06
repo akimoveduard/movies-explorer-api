@@ -7,6 +7,8 @@ const ErrorBadRequest = require('../utils/errors/bad-request'); // 400
 const ErrorUnauthorized = require('../utils/errors/unauthorized'); // 401
 const ErrorConflict = require('../utils/errors/conflict'); // 409
 
+const messages = require('../utils/messages');
+
 const SALT_ROUNDS = require('../utils/config');
 
 const createUser = (req, res, next) => {
@@ -16,32 +18,28 @@ const createUser = (req, res, next) => {
     name,
   } = req.body;
 
-  if (password) {
-    bcrypt.hash(password, Number(SALT_ROUNDS))
-      .then((hash) => {
-        User.create({
-          email,
-          password: hash,
-          name,
-        })
-          .then((user) => res.status(201).send({
-            email: user.email,
-            name: user.name,
-          }))
-          .catch((error) => {
-            if (error.name === 'MongoServerError' || error.code === 11000) {
-              next(new ErrorConflict('Пользователь с такой почтой уже зарегистрирован.'));
-            } else if (error.name === 'ValidationError') {
-              next(new ErrorBadRequest('Переданы неккоректные данные для создания пользователя.'));
-            } else {
-              next(error);
-            }
-          });
+  bcrypt.hash(password, Number(SALT_ROUNDS))
+    .then((hash) => {
+      User.create({
+        email,
+        password: hash,
+        name,
       })
-      .catch(next);
-  } else {
-    next(new ErrorBadRequest('Не указан пароль.'));
-  }
+        .then((user) => res.status(201).send({
+          email: user.email,
+          name: user.name,
+        }))
+        .catch((error) => {
+          if (error.name === 'MongoServerError' || error.code === 11000) {
+            next(new ErrorConflict(messages.errorsMessages.emailConflict));
+          } else if (error.name === 'ValidationError') {
+            next(new ErrorBadRequest(messages.errorsMessages.invalidUserData));
+          } else {
+            next(error);
+          }
+        });
+    })
+    .catch(next);
 };
 
 const authUser = (req, res, next) => {
@@ -58,10 +56,10 @@ const authUser = (req, res, next) => {
           sameSite: 'none',
           secure: true,
         })
-        .send({ message: 'Успешная авторизация.' });
+        .send({ message: messages.messages.authOk });
     })
     .catch(() => {
-      next(new ErrorUnauthorized('Неправильные почта или пароль.'));
+      next(new ErrorUnauthorized(messages.errorsMessages.wrongAuth));
     });
 };
 
@@ -94,8 +92,10 @@ const updateUser = (req, res, next) => {
       name: user.name,
     }))
     .catch((error) => {
-      if (error.name === 'ValidationError') {
-        next(new ErrorBadRequest('Переданы некорректные данные.'));
+      if (error.name === 'MongoServerError' || error.code === 11000) {
+        next(new ErrorConflict(messages.errorsMessages.emailConflict));
+      } else if (error.name === 'ValidationError') {
+        next(new ErrorBadRequest(messages.errorsMessages.invalidUserData));
       } else {
         next(error);
       }

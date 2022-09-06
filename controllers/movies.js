@@ -4,6 +4,8 @@ const ErrorBadRequest = require('../utils/errors/bad-request');
 const ErrorNotFound = require('../utils/errors/not-found');
 const ErrorForbidden = require('../utils/errors/forbidden');
 
+const messages = require('../utils/messages');
+
 const getMovies = (req, res, next) => {
   const owner = req.user.payload;
 
@@ -21,7 +23,7 @@ const postMovie = (req, res, next) => {
     .then((movie) => res.status(201).send(movie))
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        next(new ErrorBadRequest('Переданы некорректные данные для создания фильма.'));
+        next(new ErrorBadRequest(messages.errorsMessages.invalidMovieData));
       } else {
         next(error);
       }
@@ -32,13 +34,13 @@ const deleteMovie = (req, res, next) => {
   Movie.findById(req.params.movieId)
     .then((movie) => {
       if (!movie) {
-        return next(new ErrorNotFound('Фильм не найден.'));
+        return next(new ErrorNotFound(messages.errorsMessages.notfoundMovie));
       }
-      if (JSON.stringify(movie.owner) !== JSON.stringify(req.user.payload)) {
-        return next(new ErrorForbidden('Нельзя удалять чужие фильмы.'));
+      if (JSON.toString(movie.owner) !== JSON.toString(req.user.payload)) {
+        return next(new ErrorForbidden(messages.errorsMessages.forbiddenMovieDelete));
       }
       return movie.remove()
-        .then(() => res.send({ message: 'Фильм удален.' }));
+        .then(() => res.send({ message: messages.messages.movieDeleteOk }));
     })
     .catch(next);
 };

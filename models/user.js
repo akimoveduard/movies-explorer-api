@@ -4,26 +4,28 @@ const validator = require('validator');
 
 const ErrorUnauthorized = require('../utils/errors/unauthorized');
 
+const messages = require('../utils/messages');
+
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
-    required: [true, 'Почта должна быть обязательно указана.'],
+    required: [true, messages.errorsMessages.emailRequired],
     unique: true,
     validate: {
       validator: (email) => validator.isEmail(email),
-      message: 'Указана некорректная почта.',
+      message: messages.errorsMessages.invalidEmail,
     },
   },
   password: {
     type: String,
-    required: [true, 'Необходимо придумать пароль.'],
+    required: [true, messages.errorsMessages.passwordRequired],
     select: false,
   },
   name: {
     type: String,
-    required: [true, 'Имя нужно обязательно указать.'],
-    minlength: [2, 'Имя не должно быть короче 2-х символов.'],
-    maxlength: [30, 'Имя не должно быть длиннее 30-и символов.'],
+    required: [true, messages.errorsMessages.userNameRequired],
+    minlength: [2, messages.errorsMessages.userNameLength],
+    maxlength: [30, messages.errorsMessages.userNameLength],
   },
 }, { versionKey: false });
 
@@ -32,13 +34,13 @@ userSchema.statics.findUserByCredentials = function (email, password) {
     .select('+password')
     .then((user) => {
       if (!user) {
-        throw new ErrorUnauthorized('Неправильные почта или пароль.');
+        throw new ErrorUnauthorized(messages.errorsMessages.wrongAuth);
       }
 
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            throw new ErrorUnauthorized('Неправильные почта или пароль.');
+            throw new ErrorUnauthorized(messages.errorsMessages.wrongAuth);
           }
           return user;
         });
