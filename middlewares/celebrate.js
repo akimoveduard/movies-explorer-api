@@ -106,7 +106,7 @@ const validateMoviePost = celebrate({
         'string.empty': movieErrorsMessages.thumbnail.empty,
         'string.pattern.base': movieErrorsMessages.thumbnail.pattern,
       }),
-    movieId: Joi.string().required().messages({
+    movieId: Joi.number().required().messages({
       'any.required': movieErrorsMessages.movieId.required,
     }),
     nameRU: Joi.string().required().messages({
