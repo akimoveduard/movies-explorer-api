@@ -6,11 +6,13 @@ const ErrorUnauthorized = require('../utils/errors/unauthorized');
 const messages = require('../utils/messages');
 
 module.exports = (req, res, next) => {
-  const token = req.cookies.jwt;
+  const { authorization } = req.headers;
 
-  if (!token) {
+  if (!authorization || !authorization.startsWith('Bearer ')) {
     throw new ErrorUnauthorized(messages.errorsMessages.authRequired);
   }
+
+  const token = authorization.replace('Bearer ', '');
 
   let payload;
 
@@ -21,6 +23,8 @@ module.exports = (req, res, next) => {
   }
 
   req.user = payload;
+
+  console.log(payload);
 
   next();
 };
