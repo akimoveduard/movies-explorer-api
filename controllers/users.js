@@ -1,7 +1,8 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
-const getJwtToken = require('../utils/jwt');
+const { JWT_SECRET } = require('../utils/config');
 
 const ErrorBadRequest = require('../utils/errors/bad-request'); // 400
 const ErrorUnauthorized = require('../utils/errors/unauthorized'); // 401
@@ -48,13 +49,12 @@ const authUser = (req, res, next) => {
   User.findOne({ email })
     .select('+password')
     .then((user) => {
-      const token = getJwtToken(user._id);
-      res
-        .cookie('jwt', token, {
-          maxage: 3600000 * 24 * 7,
-	  sameSite: 'none',
-        })
-        .send({ message: messages.messages.authOk });
+      const token = jwt.sign(
+        { _id: user._id },
+        JWT_SECRET,
+        { expiresIn: '7d' },
+      );
+      res.status(200).send({ token });
     })
     .catch(() => {
       next(new ErrorUnauthorized(messages.errorsMessages.wrongAuth));
