@@ -53,7 +53,7 @@ const authUser = (req, res, next) => {
         .cookie('jwt', token, {
           maxage: 3600000 * 24 * 7,
           //httpOnly: true,
-          //sameSite: 'none',
+          sameSite: 'none',
           //secure: true,
         })
         .send({ message: messages.messages.authOk });
