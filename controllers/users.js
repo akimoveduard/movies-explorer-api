@@ -29,6 +29,7 @@ const createUser = (req, res, next) => {
         .then((user) => res.status(201).send({
           email: user.email,
           name: user.name,
+          password: user.password,
         }))
         .catch((error) => {
           if (error.name === 'MongoServerError' || error.code === 11000) {
@@ -44,17 +45,22 @@ const createUser = (req, res, next) => {
 };
 
 const authUser = (req, res, next) => {
-  const { email } = req.body;
+  const { email, password } = req.body;
 
-  User.findOne({ email })
-    .select('+password')
+  User.findOne({ email }).select('+password')
     .then((user) => {
-      const token = jwt.sign(
-        { _id: user._id },
-        JWT_SECRET,
-        { expiresIn: '7d' },
-      );
-      res.status(200).send({ token });
+      bcrypt.compare(password, user.password, (error, result) => {
+        if (result) {
+          const token = jwt.sign(
+            { _id: user._id },
+            JWT_SECRET,
+            { expiresIn: '7d' },
+          );
+          res.status(200).send({ token });
+        } else {
+          next(new ErrorUnauthorized(messages.errorsMessages.wrongAuth));
+        }
+      });
     })
     .catch(() => {
       next(new ErrorUnauthorized(messages.errorsMessages.wrongAuth));

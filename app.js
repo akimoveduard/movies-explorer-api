@@ -29,9 +29,9 @@ mongoose.connect(MONGODB_CONNECT);
 
 app.use(requestLogger);
 
-app.use(helmet());
+/*app.use(helmet());
 app.use(rateLimiter);
-app.use(cors(corsConfig));
+app.use(cors(corsConfig));*/
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
