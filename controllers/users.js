@@ -72,7 +72,7 @@ const logout = (req, res) => {
 };
 
 const getUser = (req, res, next) => {
-  User.findById(req.user.payload)
+  User.findById(req.user._id)
     .then((user) => res.send({
       email: user.email,
       name: user.name,
@@ -83,7 +83,7 @@ const getUser = (req, res, next) => {
 const updateUser = (req, res, next) => {
   const { email, name } = req.body;
   User.findByIdAndUpdate(
-    req.user.payload,
+    req.user._id,
     { email, name },
     {
       new: true,
