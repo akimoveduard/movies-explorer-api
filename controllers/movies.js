@@ -17,7 +17,7 @@ const getMovies = (req, res, next) => {
 };
 
 const postMovie = (req, res, next) => {
-  const owner = req.user.payload;
+  const owner = req.user._id;
 
   Movie.create({ owner, ...req.body })
     .then((movie) => res.status(201).send(movie))
