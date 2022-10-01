@@ -36,7 +36,7 @@ const deleteMovie = (req, res, next) => {
       if (!movie) {
         return next(new ErrorNotFound(messages.errorsMessages.notfoundMovie));
       }
-      if (movie.owner.toString() !== req.user.payload.toString()) {
+      if (movie.owner.toString() !== req.user._id.toString()) {
         return next(new ErrorForbidden(messages.errorsMessages.forbiddenMovieDelete));
       }
       return movie.remove()
