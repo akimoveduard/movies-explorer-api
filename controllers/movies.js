@@ -7,7 +7,7 @@ const ErrorForbidden = require('../utils/errors/forbidden');
 const messages = require('../utils/messages');
 
 const getMovies = (req, res, next) => {
-  const owner = req.user.payload;
+  const owner = req.user._id;
 
   Movie.find({ owner })
     .then((movies) => {
